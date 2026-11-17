@@ -1,1 +1,5 @@
 run_id,part,model,params,split,n_boxes,sec_per_img,what_went_right,what_went_wrong,decision
+t_y26,part2,yolo26,conf=0.25 device=cuda (Colab T4),pilot,215,1.24,Bắt tốt person/motorbike/car và vật thể ở xa,Dư nhiều box nhỏ <20px và trùng lặp; bỏ sót three_wheeler,Giữ làm model nền nhưng cần tăng ngưỡng conf
+t_y26_c05,part2,yolo26,conf=0.50 device=cuda (Colab T4),pilot,139,0.35,Giảm đáng kể box nhiễu và box trùng; tốc độ nhanh 0.35s/ảnh,Bỏ sót một số xe máy/người bị che khuất một phần và thiếu three_wheeler,Dùng kết quả sweep ngưỡng tối ưu thay vì cố định 0.5
+t_yoloe,part2,yoloe,conf=0.25 prompts=tuk-tuk/cyclo/cargo tricycle device=cuda (Colab T4),pilot,8,0.17,Phát hiện đúng lớp three_wheeler (xích lô/xe ba gác) mà YOLO26 không có,Chỉ bắt được lớp theo prompt và dễ nhầm xe máy chở hàng cồng kềnh,Kết hợp (merge) với YOLO26 để bổ sung lớp three_wheeler
+t_sam,part2,yolo26+sam,conf=0.30 device=cuda (Colab T4),pilot_2imgs,16,1.93,Tạo được 16/16 mask bám sát biên đối tượng cho bài toán segmentation,Tốc độ chậm hơn (1.93s/ảnh) và vẫn phụ thuộc box đầu vào của YOLO26,Chỉ dùng cho bước tạo mask ở phần segmentation
