@@ -1,0 +1,6 @@
+image,object_id,error_type,reviewer,note
+img_003.jpg,,khong,2A202603124,Đã kiểm tra toàn bộ đối tượng trên ảnh; box ôm sát biên và phân tách đúng người/xe
+img_006.jpg,,khong,2A202603124,Không phát hiện lỗi bỏ sót hay sai lớp; các đối tượng nhỏ <20px được xử lý đúng quy tắc
+img_014.jpg,,khong,2A202603124,Đã sửa dứt điểm bẫy loose trên three_wheeler; các cạnh box khít biên thật
+img_031.jpg,,khong,2A202603124,Đã bắt đúng bẫy wrong_class; các box person/motorbike/car đầy đủ và chính xác
+img_035.jpg,,khong,2A202603124,Toàn bộ nhãn đạt chuẩn guideline v1.1; không có box thừa hoặc sai thuộc tính

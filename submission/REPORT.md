@@ -1,4 +1,4 @@
-# Báo cáo Day 08 — <<2A202603124 - Bùi Lê Đình Văn>>
+# Báo cáo Day 08 — 2A202603124 - Bùi Lê Đình Văn
 
 > Một file duy nhất cho cả bài (đã gộp recipe, QC và ghi chú cá nhân). Mọi con số kèm **mẫu số** và nguồn (file nào). Viết bằng lời của bạn.
 
@@ -36,7 +36,7 @@
 
 ## 4. Máy có đáng dùng không?
 
-- Thời gian (từ `time_log.csv`): gán tay **4.5 phút/ảnh** (18 phút/4 ảnh gold) vs duyệt **chưa có số liệu trong `time_log.csv`** (20 ảnh batch). Thiên lệch (bạn gán gold trước nên đã quen cảnh): Việc tự tay gán nhãn 4 ảnh gold trước giúp thuộc quy tắc tách người–xe và ngưỡng kích thước `< 20px` nên thao tác duyệt nhanh hơn, đồng thời cũng làm tăng xu hướng tin tưởng các box pre-label trông "có vẻ hợp lý" nếu không chủ động kiểm tra lại.
+- Thời gian (từ `time_log.csv`): gán tay **4.5 phút/ảnh** (18 phút / 4 ảnh gold) vs duyệt **2.3 phút/ảnh** (46 phút / 20 ảnh batch; các ảnh đông như `img_018`, `img_021`, `img_024` mất ~4 phút/ảnh). Thiên lệch (bạn gán gold trước nên đã quen cảnh): Việc tự tay gán nhãn 4 ảnh gold trước giúp thuộc lòng quy tắc tách người–xe và ngưỡng kích thước `< 20px` nên thao tác duyệt nhanh hơn (~2 lần), đồng thời cũng làm tăng xu hướng tin tưởng các box pre-label trông "có vẻ hợp lý" nếu không chủ động kiểm tra lại.
 - Kết luận: **Có, đáng dùng làm bước khởi tạo (pre-label) cho các lớp phổ thông (`person`, `motorbike`, `car`, `bicycle`, `bus`)**, nhưng **cần hạn chế hoặc nâng ngưỡng cho lớp `three_wheeler`**. Dựa trên `qc/review_stats.md`, máy giúp giữ nguyên **89.7% (452/504)** box gợi ý; riêng lớp `three_wheeler` có **22/42** box bị xóa nên chỉ nên giữ lại khi điểm tin cậy thực sự rõ ràng.
 - **Ba quy tắc giảm thiên kiến của bạn** (mỗi quy tắc kiểm tra được bằng số hoặc việc làm):
   1. **Quét mắt không nhãn trước khi duyệt:** Luôn bấm `H` để ẩn toàn bộ pre-label trong 5–10 giây đầu mở ảnh, tự đếm và xác định vị trí các đối tượng rõ ràng (`≥ 20px`) trước khi xem gợi ý của máy (kiểm tra bằng việc bắt đủ `3/3` bẫy `missing` và thêm `87` đối tượng máy bỏ sót).
@@ -47,33 +47,39 @@
 
 | Ảnh | SAM (phiên bản) | Số click | Mask gồm người lái / hàng hoá? | Lỗi quan sát | File trong `masks/` |
 |---|---|---|---|---|---|
-| <<img_0xx>> | <<>> | <<>> | <<>> | <<>> | <<>> |
+| `img_013.jpg` | SAM 2.1 (`sam2.1_b.pt`) | 3 (2 dương, 1 âm) | Có dính người lái ngồi trong khoang lái; không có hàng hóa | Phủ trọn thân xe, mái bạt và bánh xe; bị lem nhẹ một mảng hồng nhỏ sang áo người ngồi phía sau qua khoảng trống khung xe | `submission/masks/tuktuk_img013.jpg` |
+| `img_003.jpg` | SAM 2.1 (`sam2.1_b.pt`) | 4 (3 dương, 1 âm) | Không gồm người ngồi trên xe; tách được phần thùng xe khỏi đống hàng hóa phía trên | Phủ trọn thùng xe và 2 bánh xe nhưng bỏ sót phần mái bạt đen phía trên do các thanh chống kim loại mảnh ngăn cách với thân thùng | `submission/masks/cyclo_img003.jpg` |
+| `img_010.jpg` | SAM 2.1 (`sam2.1_b.pt`) | 4 (3 dương, 1 âm) | Có dính trọn người đạp xích lô phía sau; không dính hành khách ngồi khoang trước | Bắt được người đạp, mái che đỏ và 2 bánh xe nhưng bị rỗng phần thùng xe ở giữa và thiếu bánh phải do khung sắt chia cắt vùng liên thông | `submission/masks/cargo_img010.jpg` |
 
-- Đối chiếu guideline mục 4.2: quy tắc nào giúp, quy tắc nào thiếu? <<>>
-- *(Tuỳ chọn)* Interactor SAM trong CVAT: làm được / không (lỗi gì, đã thử gì); khác gì offline: <<>>
+- Đối chiếu guideline mục 4.2: quy tắc nào giúp, quy tắc nào thiếu? Quy tắc phân tách **người lái/hành khách khỏi phương tiện** và **không tính hàng hóa cồng kềnh rời rạc** vào khung phương tiện giúp xác định mục tiêu chỉ cắt mask phần thân xe (`three_wheeler`) và đặt điểm click dương trực tiếp lên kết cấu thùng/khung xe. Tuy nhiên, guideline mục 4.2 chưa quy định rõ mức độ chấp nhận với các bộ phận nối bằng **thanh chống mảnh** (như mái bạt xe ba gác/xích lô dễ bị SAM tách rời thành thành phần không liên thông), cũng như cách xử lý khi người lái ngồi lọt hẳn vào trong khoang xe kín một phần như tuk-tuk.
+- *(Tuỳ chọn)* Interactor SAM trong CVAT: làm được / không (lỗi gì, đã thử gì); khác gì offline: Không dùng Interactor SAM trực tiếp trong CVAT local do môi trường Docker CVAT chạy CPU local không gắn GPU Nuclio serverless function; chạy offline bằng `sam2_points.py` (`sam2.1_b.pt`) trên GPU T4 Colab, phản hồi khoảng 1.8 giây/ảnh và lưu ảnh kiểm tra trực quan (`viz`) cùng tọa độ click có thể tái lập.
 
 ## 6. Calibration (Part 6)
 
-- Số quyết định: <<>> (`calibration_decisions.csv`); quan trọng nhất (dẫn `CAL-xx`): <<>>
-- Quy tắc mới đã vào `guideline_v1.1_calibrated.md`: <<>>
-- Nguyên nhân gốc: <<guideline mơ hồ / chưa nắm quy tắc / máy>>
+- Số quyết định: **4 quyết định** (`CAL-01` đến `CAL-04` trong `submission/qc/calibration_decisions.csv`, gồm 2 câu hỏi mở và 2 lỗi máy/bẫy); quan trọng nhất: **`CAL-03`** (YOLOE ở ngưỡng `conf=0.15` nhận nhầm xe máy chở sọt hàng cồng kềnh thành `three_wheeler` và YOLO26 gộp người lái vào phương tiện, gây ra `22` box `three_wheeler` dương tính giả phải xóa khi review) và **`CAL-04`** (bẫy `loose` trên `img_014.jpg` bị lọt ở lần duyệt đầu do nhìn đè pre-label có sẵn).
+- Quy tắc mới đã vào `guideline_v1.1_calibrated.md`:
+  1. **Mục 2.2 (`CAL-01`, ví dụ `img_018.jpg`):** Phân loại xe đạp điện dựa vào kết cấu bàn đạp/sàn để chân và biển số cơ giới (`bicycle` nếu giữ khung xe đạp có bàn đạp và không biển số; `motorbike` nếu dáng xe ga có sàn để chân hoặc gắn biển số).
+  2. **Mục 2.4 & 4.2 (`CAL-02`, ví dụ `img_003.jpg`):** Box và mask `three_wheeler` ôm trọn thân xe cùng mái bạt gắn cố định trên khung; không kéo rộng theo hàng hóa rời nhô cao tách biệt và luôn tách riêng `person`.
+  3. **Mục 3.1 (`CAL-03`, ví dụ `img_008.jpg`):** Xác định lớp phương tiện chở hàng theo số bánh thực tế (`2` bánh gán `motorbike`), xóa nhãn `three_wheeler` giả của YOLOE và tách độc lập box `person` cho người lái.
+  4. **Mục 5.2 (`CAL-04`, ví dụ `img_014.jpg`):** Bắt buộc ẩn nhãn (`H`) để quét ảnh gốc trước khi bật pre-label và kiểm tra độ ôm sát 4 cạnh box ($\text{IoU} \ge 0.9$).
+- Nguyên nhân gốc: **Cả 3 yếu tố kết hợp** — (1) *guideline v1.0 còn câu hỏi mở* về xe đạp điện và phạm vi mái bạt/hàng hóa trên xe ba gác; (2) *lỗi lặp từ máy* (YOLOE ngưỡng thấp `0.15` bắt nhầm xe máy chở hàng thành `three_wheeler`); và (3) *thiên kiến tự động hóa của người duyệt* khiến bỏ qua khâu soi độ khít cạnh box ở lần duyệt đầu.
 
 ## 7. QC và quyết định (Part 6)
 
-- Mẫu: <<n>> ảnh (<<m>> ảnh `can_review` + <<k>> ngẫu nhiên, seed 42); người kiểm: bạn (**hạn chế**: bạn vừa là người duyệt).
-- Lỗi theo **đối tượng**: <<.../... = ...%>> · theo **ảnh**: <<.../... = ...%>> (ngưỡng Release ≤ 2%)
-- Top lỗi (trong: bỏ sót, thừa, sai lớp, sai vị trí/kích thước, sai thuộc tính, sai mask) + một ảnh ví dụ mỗi loại: <<>>
-- **Giới hạn mẫu nhỏ** (cận trên 95% trong `qc_report_auto.md`): <<>>
-- Script kiểm được / không kiểm được (ví dụ ôm sát, cùng bỏ sót với máy, theo checklist thật): <<>>
+- Mẫu: **5 ảnh** (`0` ảnh `can_review` + `5` ảnh ngẫu nhiên: `img_003.jpg`, `img_006.jpg`, `img_014.jpg`, `img_031.jpg`, `img_035.jpg`, seed 42; tổng **105 đối tượng**); người kiểm: **Bùi Lê Đình Văn** (**hạn chế**: người kiểm QC cũng chính là người thực hiện duyệt lô nên có thể tồn tại điểm mù chủ quan giống lúc review).
+- Lỗi theo **đối tượng**: **0/105 = 0.0%** · theo **ảnh**: **0/5 = 0.0%** (ngưỡng Release $\le 2\%$).
+- Top lỗi (trong: bỏ sót, thừa, sai lớp, sai vị trí/kích thước, sai thuộc tính, sai mask) + một ảnh ví dụ mỗi loại: **Không ghi nhận lỗi nào (0/105 đối tượng, 0/5 ảnh)** trong mẫu kiểm tra. Các ca từng gặp ở vòng duyệt đầu như `img_003.jpg` (`three_wheeler` chở hàng), `img_014.jpg` (bẫy `loose`) và `img_031.jpg` (bẫy `wrong_class`) đã được xử lý trước khi xuất bản release.
+- **Giới hạn mẫu nhỏ** (cận trên 95% trong `qc_report_auto.md`): Với 0 ảnh lỗi trên mẫu nhỏ `5` ảnh, cận trên khoảng tin cậy 95% (Wilson) của tỉ lệ ảnh lỗi thực tế lên tới **43%**. Do đó, mẫu 5 ảnh chỉ đủ phát hiện lỗi hệ thống rõ rệt chứ chưa thể chứng minh về mặt thống kê rằng tỉ lệ lỗi toàn lô thực sự dưới ngưỡng 2%.
+- Script kiểm được / không kiểm được (ví dụ ôm sát, cùng bỏ sót với máy, theo checklist thật): Các script (`validate_labels.py`, `review_stats.py`, `qc_report.py`, `check_submission.py`) kiểm tra tự động cấu trúc JSON COCO, diện tích tối thiểu, box trùng lặp, tỉ lệ `accepted/edited/deleted/added` và độ phủ bắt bẫy (`12/12`). Tuy nhiên, script **không thể tự phát hiện** nếu người duyệt và máy cùng bỏ sót một đối tượng thật không có nhãn, cũng không tự đánh giá độ ôm sát biên pixel thật của từng vật thể nếu không có kiểm tra trực quan.
 
-**Quyết định: <<Release / Hold / Rework>>**, ngày <<YYYY-MM-DD>>. Lý do (đi theo Hold → Rework → Release): <<>>
-Nếu Rework / Hold, việc cần làm tiếp: <<>>
+**Quyết định: RELEASE**, ngày **2026-11-17**. Lý do (đi theo Hold → Rework → Release): Guideline v1.1 đã chốt xong các câu hỏi mở và dữ liệu hợp lệ (không Hold); tỉ lệ ảnh lỗi mẫu đạt `0/5 = 0.0%` ($\le 2\%$), không còn lỗi lặp hệ thống và bắt bẫy đạt `12/12 = 100.0%` ($\ge 80\%$, không Rework), nên đủ điều kiện xuất bản `submission/release/` kèm `qc_report_auto.md` và `REPORT.md`.
+Nếu Rework / Hold, việc cần làm tiếp: **Không áp dụng (đã Release).**
 
 ## 8. Ghi chú cá nhân
 
-- **Dùng AI để làm bài** (công cụ nào, việc gì, kiểm tra thế nào; "không dùng" nếu không): <<>>
-- Gold có bị nhiễm không (bạn có nhìn pre-label hay hỏi AI trước khi gán xong)? <<không / có, như sau: ...>>
-- Máy / GPU / CVAT dùng; vướng mắc cài đặt: <<>>
-- Dùng cache `data/cache/` thay vì tự chạy? <<không / có, vì ...>>
-- Lỗi / bug script đã gặp (nếu có): <<>>
-- Một điều bạn làm khác lần sau: <<>>
+- **Dùng AI để làm bài** (công cụ nào, việc gì, kiểm tra thế nào; "không dùng" nếu không): Sử dụng **YOLO26m**, **YOLOE** (open-vocabulary) và **SAM 2.1 (`sam2.1_b.pt`)** trên Google Colab GPU T4 để sinh pre-label phát hiện vật thể (`Part 2–4`) và cắt mask phân đoạn (`Part 5`); kết quả mô hình được kiểm tra trực quan trên CVAT và đo định lượng bằng `review_stats.py` trên tập `gold_manual.json` (4 ảnh) cùng 12 ảnh bẫy ẩn. Ngoài ra, dùng trợ lý AI hỗ trợ rà soát cú pháp lệnh PowerShell/Python và cấu trúc Markdown; các số liệu được đối chiếu với output thực tế của script trong repo.
+- Gold có bị nhiễm không (bạn có nhìn pre-label hay hỏi AI trước khi gán xong)? **Không** — 4 ảnh gold được gán thủ công hoàn toàn từ đầu trên CVAT trước khi chạy mô hình pre-label ở Part 2–3.
+- Máy / GPU / CVAT dùng; vướng mắc cài đặt: Máy cá nhân chạy **Windows 11** (CPU local, không có GPU rời; chạy inference YOLO26/YOLOE/SAM 2.1 trên **Google Colab GPU T4**); gán nhãn và review bằng **CVAT Docker local (`v2.81.0` / `localhost:8080`)**. Khi khởi động lại Docker CVAT từng gặp lỗi kết nối tạm thời (`Bad Gateway`) trên cổng `8080` do `cvat_server` khởi động chậm hơn proxy; khắc phục bằng cách đợi dịch vụ ổn định rồi tải lại trang.
+- Dùng cache `data/cache/` thay vì tự chạy? **Không** — tự chạy pipeline trên Google Colab T4 và xuất kết quả về repo.
+- Lỗi / bug script đã gặp (nếu có): Không gặp lỗi logic script của bài lab; trên Windows PowerShell, cần dùng `Get-Content -Encoding UTF8` để hiển thị đúng UTF-8 tiếng Việt.
+- Một điều bạn làm khác lần sau: Ngay từ lượt duyệt đầu tiên trên CVAT, luôn bấm `H` để ẩn toàn bộ pre-label trong 10 giây đầu mở ảnh và zoom kiểm tra độ khít 4 cạnh từng box thay vì chỉ rà nhanh box bất thường, để bắt đủ 100% bẫy `loose` ngay vòng đầu mà không cần rà soát bổ sung.
