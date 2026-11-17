@@ -5,7 +5,7 @@
 - Lớp (L2 / L3 / khác): L2
 - Tài khoản GitHub: DinhVann1703
 - Repo bài nộp (URL): https://github.com/DinhVann1703/K5-L23-DAY08-2A202603124-BuiLeDinhVan-AIPrelabel
-- Commit chốt bài (hash): Sẽ cập nhật sau khi commit
+- Commit chốt bài (hash): 5b85257
 - Máy: Windows 11 (CPU local) + Google Colab (GPU NVIDIA Tesla T4, CUDA)
 - CVAT (Docker): v2.81.0
 
