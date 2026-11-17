@@ -1,2 +1,3 @@
 step,images,minutes,note
 gold_manual,4,18,"Manual annotation on 4 gold images (img1: 5m, img2: 3m, img3: 5m, img4: 5m)"
+batch_review,20,46,"Review pre-labels on 20 batch images (~2m/img; img_018, img_021, img_024 took ~4m each due to high object density)"
